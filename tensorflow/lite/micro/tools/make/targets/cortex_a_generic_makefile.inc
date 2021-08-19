@@ -16,80 +16,23 @@
 # Generic Makefile target for ARM Cortex M builds.
 # For more info see: tensorflow/lite/micro/cortex_m_generic/README.md
 
-FLOAT := soft
+FLOAT :=hard
 GCC_TARGET_ARCH := $(TARGET_ARCH)
 
 # Explicitly set this to true to include the kissfft symbols.
 INCLUDE_MICRO_SPEECH := false
 
-ifeq ($(TARGET_ARCH), cortex-m0)
-  CORE=M0
-  ARM_LDFLAGS := -Wl,--cpu=Cortex-M0
+ifeq ($(TARGET_ARCH), cortex-a53)
+  CORE=A5
+  ARM_LDFLAGS := -Wl,--cpu=Cortex-a53
+  GCC_TARGET_ARCH := cortex-a53
 
 
-else ifeq ($(TARGET_ARCH), cortex-m0plus)
-  CORE=M0plus
-  ARM_LDFLAGS := -Wl,--cpu=Cortex-M0plus
+else ifeq ($(TARGET_ARCH), cortex-a72)
+  CORE=A7
+  ARM_LDFLAGS := -Wl,--cpu=Cortex-A72
+  GCC_TARGET_ARCH := cortex-a72
 
-
-else ifeq ($(TARGET_ARCH), cortex-m3)
-  CORE=M3
-  ARM_LDFLAGS := -Wl,--cpu=Cortex-M3
-
-else ifeq ($(TARGET_ARCH), cortex-m33)
-  CORE=M33
-  ARM_LDFLAGS := -Wl,--cpu=Cortex-M33
-  TARGET_SPECIFIC_FLAGS += -D__DSP_PRESENT=1 -D__FPU_PRESENT=1 -D__VTOR_PRESENT=1 -D__FPU_USED=1
-  FLOAT=hard
-
-else ifeq ($(TARGET_ARCH), cortex-m33+nodsp)
-  CORE=M33
-  ARM_LDFLAGS := -Wl,--cpu=Cortex-M33.no_dsp.no_fp
-
-else ifeq ($(TARGET_ARCH), cortex-m4)
-  CORE=M4
-  ARM_LDFLAGS := -Wl,--cpu=Cortex-M4.no_fp
-  GCC_TARGET_ARCH := cortex-m4+nofp
-
-else ifeq ($(TARGET_ARCH), cortex-m4+fp)
-  CORE=M4
-  ARM_LDFLAGS := -Wl,--cpu=Cortex-M4
-  TARGET_SPECIFIC_FLAGS += -D__FPU_PRESENT=1
-  FLOAT=hard
-  GCC_TARGET_ARCH := cortex-m4
-
-else ifeq ($(TARGET_ARCH), cortex-m4+sfp)
-  CORE=M4
-  ARM_LDFLAGS := -Wl,--cpu=Cortex-M4
-  TARGET_SPECIFIC_FLAGS += -D__FPU_PRESENT=1 -mfpu=fpv4-sp-d16
-  FLOAT=softfp
-  GCC_TARGET_ARCH := cortex-m4
-
-else ifeq ($(TARGET_ARCH), cortex-m55)
-  CORE=M55
-  ARM_LDFLAGS := -Wl,--cpu=8.1-M.Main.mve.fp
-  TARGET_SPECIFIC_FLAGS += -D__DSP_PRESENT=1 -D__FPU_PRESENT=1
-  FLOAT=hard
-
-else ifeq ($(TARGET_ARCH), cortex-m55+nodsp+nofp)
-  CORE=M55
-  ARM_LDFLAGS := -Wl,--cpu=8.1-M.Main.mve.no_dsp.no_fp
-
-else ifeq ($(TARGET_ARCH), cortex-m55+nofp)
-  CORE=M55
-  ARM_LDFLAGS := -Wl,--cpu=8.1-M.Main.mve.no_fp
-  TARGET_SPECIFIC_FLAGS += -D__DSP_PRESENT=1
-
-else ifeq ($(TARGET_ARCH), cortex-m7)
-  CORE=M7
-  ARM_LDFLAGS := -Wl,--cpu=Cortex-M7.no_fp
-  GCC_TARGET_ARCH := cortex-m7+nofp
-
-else ifeq ($(TARGET_ARCH), cortex-m7+fp)
-  CORE=M7
-  ARM_LDFLAGS := -Wl,--cpu=Cortex-M7
-  FLOAT=hard
-  GCC_TARGET_ARCH := cortex-m7
 
 else ifeq ($(TARGET_ARCH), project_generation)
  # None of the parameters matter since we are not going to build any code.
@@ -97,12 +40,6 @@ else
   $(error "TARGET_ARCH=$(TARGET_ARCH) is not supported")
 endif
 
-ifneq ($(filter cortex-m55%,$(TARGET_ARCH)),)
-  # soft-abi=soft disables MVE - use softfp instead for M55.
-  ifeq ($(FLOAT),soft)
-    FLOAT=softfp
-  endif
-endif
 
 # Toolchain specfic flags
 ifeq ($(TOOLCHAIN), armclang)
@@ -170,22 +107,6 @@ PLATFORM_FLAGS = \
 CXXFLAGS += $(PLATFORM_FLAGS)
 CCFLAGS += $(PLATFORM_FLAGS)
 
-ifeq ($(OPTIMIZED_KERNEL_DIR), cmsis_nn)
-  CCFLAGS += \
-    -I./CMSIS/Core/Include/ \
-    -I./CMSIS/DSP/Include/ \
-    -I./CMSIS/NN/Include/ 
-
-  CXXFLAGS += \
-    -I./CMSIS/Core/Include/ \
-    -I./CMSIS/DSP/Include/ \
-    -I./CMSIS/NN/Include/     
-endif
-
-
-# Needed for the project generation interface.
-MICROLITE_CC_HDRS += \
-  tensorflow/lite/micro/cortex_m_generic/debug_log_callback.h
 
 # We only include micro_speech for project generation to allow for all the files
 # to be downloaded. We do not include it for an actual build with the
