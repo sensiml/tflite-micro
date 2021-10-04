@@ -90,7 +90,7 @@ def get_activation_interpreter(activation):
 
     activation = activation.split("/")[-1]
 
-    ignored_functions = [
+    included_functions = [
         "RESHAPE",
         "FAKEQUANTWITHMINMAXVARS",
         "ADD",
@@ -109,9 +109,10 @@ def get_activation_interpreter(activation):
         "RESOURCE",
         "AVGPOOL",
         "QUANTIZE",
+        "CONST",
     ]
 
-    if any(x in activation.upper() for x in ignored_functions):
+    if any(x in activation.upper() for x in included_functions):
         return None
 
     if activation:
