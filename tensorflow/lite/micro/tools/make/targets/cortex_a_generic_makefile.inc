@@ -24,13 +24,13 @@ INCLUDE_MICRO_SPEECH := false
 
 ifeq ($(TARGET_ARCH), cortex-a53)
   CORE=A5
-  ARM_LDFLAGS := -Wl,--cpu=Cortex-a53
+  ARM_LDFLAGS := -Wl,--cpu=Cortex-A53 -mfpu=crypto-neon-fp-armv8
   GCC_TARGET_ARCH := cortex-a53
 
 
 else ifeq ($(TARGET_ARCH), cortex-a72)
   CORE=A7
-  ARM_LDFLAGS := -Wl,--cpu=Cortex-A72
+  ARM_LDFLAGS := -Wl,--cpu=Cortex-A72 -mfpu=crypto-neon-fp-armv8
   GCC_TARGET_ARCH := cortex-a72
 
 
