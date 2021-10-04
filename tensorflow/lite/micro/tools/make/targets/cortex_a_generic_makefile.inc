@@ -27,12 +27,12 @@ ifeq ($(TARGET_ARCH), cortex-a53)
   ARM_LDFLAGS := -Wl,--cpu=Cortex-A53 -mfpu=crypto-neon-fp-armv8
   GCC_TARGET_ARCH := cortex-a53
 
-ifeq ($(TARGET_ARCH), cortex-a53+fp)
+else ifeq ($(TARGET_ARCH), cortex-a53+fp)
   CORE=A5
   ARM_LDFLAGS := -Wl,--cpu=Cortex-A53 -mfpu=crypto-neon-fp-armv8
   GCC_TARGET_ARCH := cortex-a53
 
-ifeq ($(TARGET_ARCH), cortex-a53+sfp)
+else ifeq ($(TARGET_ARCH), cortex-a53+sfp)
   CORE=A5
   ARM_LDFLAGS := -Wl,--cpu=Cortex-A53 -mfpu=crypto-neon-fp-armv8
   GCC_TARGET_ARCH := cortex-a53
