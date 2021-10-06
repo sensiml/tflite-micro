@@ -143,11 +143,12 @@ else ifeq ($(TOOLCHAIN), gcc)
   CXXFLAGS += $(FLAGS_GCC)
   CCFLAGS += $(FLAGS_GCC)
 
+
 else
   $(error "TOOLCHAIN=$(TOOLCHAIN) is not supported.")
 endif
 
-# TODO(#47718): resolve warnings.
+# TODO(#47718): resolve warnings.make: *** //: Is a directory.
 OMIT_ERRORS = \
   -Wno-implicit-fallthrough \
   -Wno-unused-variable
@@ -174,12 +175,12 @@ ifeq ($(OPTIMIZED_KERNEL_DIR), cmsis_nn)
   CCFLAGS += \
     -I./CMSIS/Core/Include/ \
     -I./CMSIS/DSP/Include/ \
-    -I./CMSIS/NN/Include/ 
+    -I./CMSIS/NN/Include/
 
   CXXFLAGS += \
     -I./CMSIS/Core/Include/ \
     -I./CMSIS/DSP/Include/ \
-    -I./CMSIS/NN/Include/     
+    -I./CMSIS/NN/Include/
 endif
 
 

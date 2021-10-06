@@ -13,10 +13,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 ==============================================================================*/
 
-#include "tensorflow/lite/micro/micro_api.h"
-
 #include "tensorflow/lite/micro/examples/model_runner/output_handler.h"
 #include "tensorflow/lite/micro/kernels/micro_ops.h"
+#include "tensorflow/lite/micro/micro_api.h"
 #include "tensorflow/lite/micro/micro_error_reporter.h"
 #include "tensorflow/lite/micro/micro_interpreter.h"
 #include "tensorflow/lite/schema/schema_generated.h"
@@ -55,8 +54,8 @@ int micro_model_setup(const void* model_data, int kTensorArenaSize,
   TF_LITE_REPORT_ERROR(error_reporter, "Create Interpretor");
 
   // clang-format off
-    // Only Pull in functions that are needed by the model
-  static tflite::AllOpsResolver resolver;
+  // All functions are included in the library
+ static tflite::AllOpsResolver resolver;
   // clang-format on
 
   static tflite::MicroInterpreter static_interpreter(

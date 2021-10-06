@@ -26,11 +26,13 @@ ifeq ($(TARGET_ARCH), cortex-a53)
   CORE=A5
   ARM_LDFLAGS := -Wl,--cpu=Cortex-A53 -mfpu=crypto-neon-fp-armv8
   GCC_TARGET_ARCH := cortex-a53
+  FLOAT := soft
 
 else ifeq ($(TARGET_ARCH), cortex-a53+fp)
   CORE=A5
   ARM_LDFLAGS := -Wl,--cpu=Cortex-A53 -mfpu=crypto-neon-fp-armv8
   GCC_TARGET_ARCH := cortex-a53
+  FLOAT :=hard
 
 else ifeq ($(TARGET_ARCH), cortex-a53+sfp)
   CORE=A5
@@ -42,20 +44,20 @@ else ifeq ($(TARGET_ARCH), cortex-a72)
   CORE=A7
   ARM_LDFLAGS := -Wl,--cpu=Cortex-A72 -mfpu=crypto-neon-fp-armv8
   GCC_TARGET_ARCH := cortex-a72
+  FLOAT := soft
 
 
 else ifeq ($(TARGET_ARCH), cortex-a72+fp)
   CORE=A7
   ARM_LDFLAGS := -Wl,--cpu=Cortex-A72 -mfpu=crypto-neon-fp-armv8
   GCC_TARGET_ARCH := cortex-a72
+  FLOAT :=hard
 
 else ifeq ($(TARGET_ARCH), cortex-a72+sfp)
   CORE=A7
   ARM_LDFLAGS := -Wl,--cpu=Cortex-A72 -mfpu=crypto-neon-fp-armv8
   GCC_TARGET_ARCH := cortex-a72
   FLOAT=softfp
-
-
 
 
 else ifeq ($(TARGET_ARCH), project_generation)
