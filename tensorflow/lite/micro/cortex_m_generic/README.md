@@ -87,3 +87,5 @@ make -j
 
 
 
+
+make -f tensorflow/lite/micro/tools/make/Makefile TARGET=x86ming64 TARGET_ARCH=x86-w64-mingw32  microlite
