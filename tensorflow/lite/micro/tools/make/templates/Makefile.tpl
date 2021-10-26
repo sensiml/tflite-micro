@@ -31,6 +31,8 @@ LDFLAGS += %{LINKER_FLAGS}%
 # library to be generated
 MICROLITE_LIB = libtensorflow-microlite.a
 
+MICROLITE_SO = libtensorflow-microlite.so
+
 %.o: %.cc
 	$(CXX) $(CXXFLAGS) $(INCLUDES) -c $< -o $@
 
@@ -46,9 +48,16 @@ $(MICROLITE_LIB): tensorflow/lite/schema/schema_generated.h $(LIBRARY_OBJS)
 	@mkdir -p $(dir $@)
 	$(AR) $(ARFLAGS) $(MICROLITE_LIB) $(LIBRARY_OBJS)
 
+# Creates a tensorflow-litemicro.a which excludes any example code.
+$(MICROLITE_SO): tensorflow/lite/schema/schema_generated.h $(LIBRARY_OBJS)
+	@mkdir -p $(dir $@)
+	$(CXX) -shared  -o $(MICROLITE_SO) $(LIBRARY_OBJS)
+
 all: %{EXECUTABLE}%
 
 lib: $(MICROLITE_LIB)
+
+so: $(MICROLITE_SO)
 
 clean:
 	-$(RM) $(OBJS)
