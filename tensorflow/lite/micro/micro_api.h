@@ -29,13 +29,12 @@ int micro_model_setup(const void* model_data, int kTensorArenaSize,
 // Runs one iteration of data gathering and inference. This should be called
 // repeatedly from the application code. The name needs to be loop() for Arduino
 // compatibility.
-int micro_model_invoke(float* input_data, int num_inputs, float* results,
+int micro_model_invoke(uint8_t* input_data, int num_inputs, float* results,
                        int num_outputs);
 
 // Returns a pointer to the error reporter
 void* get_micro_api_error_reporter();
 
-int tensor_used_size();
 
 #ifdef __cplusplus
 }

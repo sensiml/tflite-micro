@@ -83,10 +83,18 @@ int micro_model_setup(const void* model_data, int kTensorArenaSize,
   return 0;
 }
 
-int micro_model_invoke(float* input_data, int num_inputs, float* results,
+int micro_model_invoke(uint8_t* input_data, int num_inputs, float* results,
                        int num_outputs) {
-  for (int i = 0; i < num_inputs; i++) {
-    model_input->data.f[i] = input_data[i];
+  if (model_input->type == kTfLiteFloat32) {
+    for (int i = 0; i < num_inputs; i++) {
+      model_input->data.f[i] = (float)input_data[i];
+    }
+  }
+
+  if (model_input->type == kTfLiteUInt8) {
+    for (int i = 0; i < num_inputs; i++) {
+      model_input->data.uint8[i] = input_data[i];
+    }
   }
 
   // Run inference, and report any error.
@@ -98,11 +106,18 @@ int micro_model_invoke(float* input_data, int num_inputs, float* results,
   }
 
   // Read the predicted y value from the model's output tensor
+  if (model_output->type == kTfLiteFloat32) {
   for (int i = 0; i < num_outputs; i++) {
     results[i] = model_output->data.f[i];
   }
+  }
+
+  if (model_output->type == kTfLiteUInt8) {
+  for (int i = 0; i < num_outputs; i++) {
+    results[i] = model_output->data.uint8[i];
+  }
+  }
+
 
   return 0;
 }
-
-void* get_micro_api_error_reporter() { return error_reporter; }
