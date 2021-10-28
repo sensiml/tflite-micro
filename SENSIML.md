@@ -6,3 +6,6 @@ make -j -f tensorflow/lite/micro/tools/make/Makefile TARGET=cortex_a_generic TAR
 
 docker run -it  -v $(pwd):/tflite-micro 358252950181.dkr.ecr.us-west-2.amazonaws.com/sensiml/arm_none_linux_gnueabihf_base:10.3.1 TENSORFLOWarm_none_linux_gnueabihf
 cd tflite-micro && make -j lib 
+
+
+docker run -it -v $(pwd):/tflite-micro 358252950181.dkr.ecr.us-west-2.amazonaws.com/sml_x86mingw_generic:9.3
