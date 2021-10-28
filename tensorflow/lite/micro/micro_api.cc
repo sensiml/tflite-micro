@@ -83,7 +83,7 @@ int micro_model_setup(const void* model_data, int kTensorArenaSize,
   return 0;
 }
 
-int micro_model_invoke(uint8_t* input_data, int num_inputs, float* results,
+int micro_model_invoke(unsigned char* input_data, int num_inputs, float* results,
                        int num_outputs) {
   if (model_input->type == kTfLiteFloat32) {
     for (int i = 0; i < num_inputs; i++) {
@@ -96,6 +96,13 @@ int micro_model_invoke(uint8_t* input_data, int num_inputs, float* results,
       model_input->data.uint8[i] = input_data[i];
     }
   }
+
+
+  if (model_input->type == kTfLiteInt8) {
+    for (int i = 0; i < num_inputs; i++) {
+      model_input->data.int8[i] = (int8_t)(input_data[i]-127);
+    }
+  }  
 
   // Run inference, and report any error.
   TfLiteStatus invoke_status = interpreter->Invoke();
@@ -114,9 +121,16 @@ int micro_model_invoke(uint8_t* input_data, int num_inputs, float* results,
 
   if (model_output->type == kTfLiteUInt8) {
   for (int i = 0; i < num_outputs; i++) {
-    results[i] = model_output->data.uint8[i];
+    results[i] = (float)model_output->data.uint8[i];
   }
   }
+
+
+  if (model_output->type == kTfLiteInt8) {
+  for (int i = 0; i < num_outputs; i++) {
+    results[i] = (float)model_output->data.int8[i];
+  }
+  }  
 
 
   return 0;

@@ -106,6 +106,18 @@ else ifeq ($(TOOLCHAIN), gcc)
   CXXFLAGS += $(FLAGS_GCC)
   CCFLAGS += $(FLAGS_GCC)
 
+else ifeq ($(TOOLCHAIN), arm-none-linux-gnueabihf)
+  TARGET_DEFAULT_TOOLCHAIN_ROOT := ${GNU_INSTALL_ROOT}/bin/
+  TARGET_TOOLCHAIN_ROOT := $(TARGET_DEFAULT_TOOLCHAIN_ROOT)
+
+  TARGET_TOOLCHAIN_PREFIX := arm-none-linux-gnueabihf-
+
+  FLAGS_GCC = -mcpu=$(GCC_TARGET_ARCH) -mfpu=auto
+  CXXFLAGS += $(FLAGS_GCC)
+  CXXFLAGS += -fPIC
+  CCFLAGS += $(FLAGS_GCC)
+  CCFLAGS += -fPIC
+
 else
   $(error "TOOLCHAIN=$(TOOLCHAIN) is not supported.")
 endif
