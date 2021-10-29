@@ -43,7 +43,6 @@ TARGET_TOOLCHAIN_PREFIX := x86_64-w64-mingw32-
     -mwin32 \
     -mwindows \
     -mdll \
-    -Wl \
     -D_WIN32 \
     -DADD_EXPORTS \
     -fPIC
