@@ -100,6 +100,7 @@ def get_activation_interpreter(activation):
         "INPUT",
         "TRANSPOSE",
         "IDENTITY",
+        "BIAS",
         "CONV2D_BIAS",
         "SHAPE",
         "READVARIABLEOP",
