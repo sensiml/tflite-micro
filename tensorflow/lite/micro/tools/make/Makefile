@@ -324,7 +324,7 @@ tensorflow/lite/micro/kernels/hard_swish.cc \
 tensorflow/lite/micro/kernels/hard_swish_common.cc \
 tensorflow/lite/micro/kernels/if.cc \
 tensorflow/lite/micro/kernels/kernel_runner.cc \
-tensorflow/lite/micro/kernels/kernel_util.cc \
+tensorflow/lite/micro/kernels/micro_kernel_util.cc \
 tensorflow/lite/micro/kernels/l2norm.cc \
 tensorflow/lite/micro/kernels/l2_pool_2d.cc \
 tensorflow/lite/micro/kernels/leaky_relu.cc \
