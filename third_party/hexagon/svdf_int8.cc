@@ -52,7 +52,7 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "tensorflow/lite/kernels/kernel_util.h"
 #include "tensorflow/lite/kernels/op_macros.h"
 #include "tensorflow/lite/micro/kernels/activation_utils.h"
-#include "tensorflow/lite/micro/kernels/kernel_util.h"
+#include "tensorflow/lite/micro/kernels/micro_kernel_util.h"
 #include "tensorflow/lite/micro/micro_utils.h"
 #include "third_party/hexagon/hexagon_svdf.h"
 #include "third_party/hexagon/hexagon_tflm_translation_svdf.h"
@@ -85,14 +85,15 @@ TfLiteStatus HexagonSvdfEvalInt8(TfLiteContext* context, TfLiteNode* node) {
         context, node, input, weights_feature, weights_time, bias, params,
         activation_state, output, node->user_data);
   } else {
-    EvalInt16SvdfReference(context, node, input, weights_feature,
-                           weights_time, bias, params, activation_state,
-                           output, data.reference_op_data);
+    EvalInt16SvdfReference(context, node, input, weights_feature, weights_time,
+                           bias, params, activation_state, output,
+                           data.reference_op_data);
   }
   return kTfLiteOk;
 }
 
-void* HexagonSvdfInit(TfLiteContext* context, const char* buffer, size_t length) {
+void* HexagonSvdfInit(TfLiteContext* context, const char* buffer,
+                      size_t length) {
   TFLITE_DCHECK(context->AllocatePersistentBuffer != nullptr);
   void* data = context->AllocatePersistentBuffer(context, sizeof(OpDataSvdf));
 
@@ -118,7 +119,7 @@ TfLiteStatus HexagonSvdfPrepare(TfLiteContext* context, TfLiteNode* node) {
   if (tflite::hexagon_svdf::HexagonOptimizable(context, node)) {
     TF_LITE_ENSURE_OK(context,
                       tflite::hexagon_svdf::HexagonPrepare(context, node));
-  } 
+  }
 
   return kTfLiteOk;
 }
