@@ -114,6 +114,9 @@ def get_activation_interpreter(activation):
     if any(x in activation.upper() for x in included_functions):
         return None
 
+    if activation.isdigit():
+        return None
+
     if activation:
         return activation.upper()
 
