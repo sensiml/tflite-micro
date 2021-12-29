@@ -34,11 +34,6 @@ def parse_model_hex_string(hex_string):
 def simple_name(function):
     return function.lower().replace("_", "")
 
-
-def simple_name(function):
-    return function.lower().replace("_", "")
-
-
 def parse_all_ops(path):
 
     if not os.path.exists(path):
@@ -142,17 +137,21 @@ def parse_tensorflow_binary_model(model_binary):
             used_functions.add(name)
 
         for index in op["inputs"]:
+
             activation = get_activation_interpreter(
                 tf_model._get_tensor_details(index)["name"]
             )
+            print("input",index, tf_model._get_tensor_details(index)["name"], activation)
 
             if activation:
                 used_functions.add(activation)
 
         for index in op["outputs"]:
+
             activation = get_activation_interpreter(
                 tf_model._get_tensor_details(index)["name"]
             )
+            print("output",index, tf_model._get_tensor_details(index)["name"], activation)
 
             if activation:
                 used_functions.add(activation)
@@ -164,14 +163,11 @@ def fuzzy_match(function, micro_functions):
     return simple_name(function) in [x.lower() for x in micro_functions]
 
 
-def fuzzy_match(function, micro_functions):
-    return simple_name(function) in [x.lower() for x in micro_functions]
-
-
 def validate_micro_functions_available(used_functions, micro_functions):
 
-    print(micro_functions)
+    print("AllOps Functions", micro_functions)
     for used_function in used_functions:
+        print('Checking included op', simple_name(used_function))
         if not fuzzy_match(used_function, micro_functions):
             raise Exception(
                 "model uses {} which is not a supported function in tf micro ".format(
