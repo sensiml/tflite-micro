@@ -111,7 +111,9 @@ def get_activation_interpreter(activation):
         "AVGPOOL",
         "QUANTIZE",
         "CONST",
-        "BIAS"
+        "BIAS",
+        "STACK",
+        "STATEFULPARTITIONEDCALL"
     ]
 
     if any(x in activation.upper() for x in included_functions):
