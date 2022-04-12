@@ -43,8 +43,6 @@ INCLUDES += \
 -I$(GECKO_SDK_PATH)/platform/driver/mvp/config \
 -I$(GECKO_SDK_PATH)/platform/driver/mvp/inc
 
-CFLAGS += -DEFR32MG24B310F1536IM48=1  -mfp16-format=ieee
-CXXFLAGS += -DEFR32MG24B310F1536IM48=1  -mfp16-format=ieee
 
 SILABS_CFLAGS = '-DNDEBUG=1' \
 '-DTF_LITE_STATIC_MEMORY=1' \
@@ -53,18 +51,15 @@ SILABS_CFLAGS = '-DNDEBUG=1' \
 '-DSL_BOARD_REV="A03"' \
 '-DSL_COMPONENT_CATALOG_PRESENT=1' \
 '-DTF_LITE_MCU_DEBUG_LOG=1' \
-'-DCMSIS_NN=1'
-
-CCFLAGS += $(THIRD_PARTY_CC_HDRS)
-CXXFLAGS += $(THIRD_PARTY_CC_HDRS)
+'-DCMSIS_NN=1' \
+'-mfp16-format=ieee' 
 
 CCFLAGS +=  $(SILABS_CFLAGS)
 CXXFLAGS +=  $(SILABS_CFLAGS)
 
-LDFLAGS += -Wl,--fatal-warnings -Wl,--gc-sections -lm  -lstdc++ \
+LDFLAGS += -lstdc++ \
 -lgcc \
 -lc \
--lm \
 -lnosys \
 -mfpu=fpv5-sp-d16 
 """.format(GECKO_SDK_PATH=GECKO_SDK_PATH, CMSIS_PATH=CMSIS_PATH)
