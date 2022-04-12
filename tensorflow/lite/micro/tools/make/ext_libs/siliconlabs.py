@@ -66,11 +66,11 @@ LDFLAGS += -lstdc++ \
 
 
 def replace_list():
-    return (["# FILL_HERE", get_fill_string()], ["-D__DSP_PRESENT=1",""], ["-D__FPU_PRESENT=1",""], ["-D__VTOR_PRESENT=1",""] ["-D__FPU_USED=1",""],["FLOAT=hard",""])
+    return (["# FILL_HERE", get_fill_string()], ["-D__DSP_PRESENT=1",""], ["-D__FPU_PRESENT=1",""], ["-D__VTOR_PRESENT=1",""], ["-D__FPU_USED=1",""],["FLOAT=hard",""])
 
 
 def update_makefile(tmp_file_str):
-    for item in replace_list():
-        tmp_file_str = tmp_file_str.replace(item[0], item[1])
+    for item, filler in replace_list():
+        tmp_file_str = tmp_file_str.replace(item,filler)
 
     return tmp_file_str
