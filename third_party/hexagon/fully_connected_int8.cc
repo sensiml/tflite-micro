@@ -52,7 +52,7 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "tensorflow/lite/kernels/internal/tensor_ctypes.h"
 #include "tensorflow/lite/kernels/kernel_util.h"
 #include "tensorflow/lite/micro/kernels/fully_connected.h"
-#include "tensorflow/lite/micro/kernels/kernel_util.h"
+#include "tensorflow/lite/micro/kernels/micro_kernel_util.h"
 #include "third_party/hexagon/hexagon_fully_connected.h"
 
 namespace tflite {
@@ -92,7 +92,7 @@ TfLiteStatus EvalQuantizedInt8(TfLiteContext* context, TfLiteNode* node,
 }  // namespace
 
 void* HexagonFullyConnectedInit(TfLiteContext* context, const char* buffer,
-                         size_t length) {
+                                size_t length) {
   TFLITE_DCHECK(context->AllocatePersistentBuffer != nullptr);
   void* data = nullptr;
   data = context->AllocatePersistentBuffer(context,
@@ -109,7 +109,8 @@ void* HexagonFullyConnectedInit(TfLiteContext* context, const char* buffer,
   return data;
 }
 
-TfLiteStatus HexagonFullyConnectedPrepare(TfLiteContext* context, TfLiteNode* node) {
+TfLiteStatus HexagonFullyConnectedPrepare(TfLiteContext* context,
+                                          TfLiteNode* node) {
   TFLITE_DCHECK(node->user_data != nullptr);
   TFLITE_DCHECK(node->builtin_data != nullptr);
 
@@ -138,12 +139,14 @@ TfLiteStatus HexagonFullyConnectedPrepare(TfLiteContext* context, TfLiteNode* no
   if (tflite::hexagon_fully_connected::HexagonOptimizable(context, node)) {
     return tflite::hexagon_fully_connected::HexagonPrepare(context, node);
   } else {
-    return CalculateOpDataFullyConnected(context, params->activation, input->type, input,
-                           filter, bias, output, &data->reference_op_data);
+    return CalculateOpDataFullyConnected(context, params->activation,
+                                         input->type, input, filter, bias,
+                                         output, &data->reference_op_data);
   }
 }
 
-TfLiteStatus HexagonFullyConnectedEvalInt8(TfLiteContext* context, TfLiteNode* node) {
+TfLiteStatus HexagonFullyConnectedEvalInt8(TfLiteContext* context,
+                                           TfLiteNode* node) {
   TFLITE_DCHECK(node->builtin_data != nullptr);
 
   const TfLiteEvalTensor* input =

@@ -25,7 +25,7 @@ limitations under the License.
 #include "tensorflow/lite/kernels/kernel_util.h"
 #include "tensorflow/lite/kernels/op_macros.h"
 #include "tensorflow/lite/micro/kernels/activation_utils.h"
-#include "tensorflow/lite/micro/kernels/kernel_util.h"
+#include "tensorflow/lite/micro/kernels/micro_kernel_util.h"
 #include "tensorflow/lite/micro/kernels/xtensa/fixedpoint_utils.h"
 #include "tensorflow/lite/micro/kernels/xtensa/xtensa.h"
 

@@ -24,7 +24,7 @@ limitations under the License.
 #include "tensorflow/lite/kernels/op_macros.h"
 #include "tensorflow/lite/micro/kernels/ceva/ceva_common.h"
 #include "tensorflow/lite/micro/kernels/ceva/ceva_tflm_lib.h"
-#include "tensorflow/lite/micro/kernels/kernel_util.h"
+#include "tensorflow/lite/micro/kernels/micro_kernel_util.h"
 #include "tensorflow/lite/micro/kernels/softmax.h"
 #ifdef MCPS_MEASUREMENT
 #include "tensorflow/lite/micro/kernels/ceva/mcps_macros.h"

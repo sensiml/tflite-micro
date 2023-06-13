@@ -52,8 +52,7 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "tensorflow/lite/kernels/internal/reference/integer_ops/fully_connected.h"
 #include "tensorflow/lite/kernels/internal/tensor_ctypes.h"
 #include "tensorflow/lite/kernels/kernel_util.h"
-#include "tensorflow/lite/micro/kernels/kernel_util.h"
-
+#include "tensorflow/lite/micro/kernels/micro_kernel_util.h"
 #include "third_party/hexagon/hexagon_fully_connected.h"
 #include "third_party/hexagon/hexagon_tflm_translation_fully_connected.h"
 
@@ -86,7 +85,8 @@ TfLiteStatus EvalFloat(TfLiteContext* context, TfLiteNode* node,
 
 }  // namespace
 
-TfLiteStatus HexagonFullyConnectedEval(TfLiteContext* context, TfLiteNode* node) {
+TfLiteStatus HexagonFullyConnectedEval(TfLiteContext* context,
+                                       TfLiteNode* node) {
   TFLITE_DCHECK(node->builtin_data != nullptr);
   const auto* params =
       static_cast<const TfLiteFullyConnectedParams*>(node->builtin_data);
