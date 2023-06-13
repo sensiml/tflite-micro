@@ -7,3 +7,4 @@ refresh_compile_commands(
     name = "refresh_compile_commands",
     targets = ["//..."],
 )
+

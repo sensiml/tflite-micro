@@ -100,6 +100,8 @@ endif
 
 TEST_SCRIPT :=
 
+ALL_PROJECT_TARGETS :=
+
 MICROLITE_LIBS := -lm
 
 # For the optimized_kernel_dir, and co-processor as specified on the
@@ -118,6 +120,8 @@ endif
 
 ifeq ($(TOOLCHAIN), armclang)
   CORE_OPTIMIZATION_LEVEL := -Oz
+else ifeq ($(TOOLCHAIN), xc32)
+  CORE_OPTIMIZATION_LEVEL := 
 else
   CORE_OPTIMIZATION_LEVEL := -Os
 endif
@@ -557,6 +561,7 @@ include $(MAKEFILE_DIR)/additional_kernels.inc
 
 MICROLITE_CC_SRCS := $(filter-out $(MICROLITE_TEST_SRCS), $(MICROLITE_CC_BASE_SRCS))
 MICROLITE_CC_SRCS := $(filter-out $(MICROLITE_BENCHMARK_SRCS), $(MICROLITE_CC_SRCS))
+MICROLITE_CC_SRCS := $(filter-out $(MICROLITE_CC_KERNEL_SRCS), $(MICROLITE_CC_SRCS))
 
 CODEGEN_RUNTIME_CC_SRCS := \
 $(TENSORFLOW_ROOT)codegen/runtime/micro_codegen_context.cc
@@ -580,9 +585,11 @@ ifneq ($(DOWNLOAD_RESULT), SUCCESS)
   $(error Something went wrong with the kissfft download: $(DOWNLOAD_RESULT))
 endif
 
-DOWNLOAD_RESULT := $(shell $(MAKEFILE_DIR)/pigweed_download.sh ${DOWNLOADS_DIR} $(TENSORFLOW_ROOT))
-ifneq ($(DOWNLOAD_RESULT), SUCCESS)
-  $(error Something went wrong with the pigweed download: $(DOWNLOAD_RESULT))
+ifdef $(SKIP_PIGWEED_DOWNLOAD)
+  DOWNLOAD_RESULT := $(shell $(MAKEFILE_DIR)/pigweed_download.sh ${DOWNLOADS_DIR} $(TENSORFLOW_ROOT))
+  ifneq ($(DOWNLOAD_RESULT), SUCCESS)
+    $(error Something went wrong with the pigweed download: $(DOWNLOAD_RESULT))
+  endif
 endif
 
 include $(MAKEFILE_DIR)/third_party_downloads.inc
@@ -684,6 +691,10 @@ ALL_SRCS := \
 	$(MICROLITE_CC_KERNEL_SRCS) \
 	$(MICROLITE_TEST_SRCS)
 
+MICROLITE_CC_PROJ_SRCS := \
+	$(MICROLITE_CC_SRCS) \
+	$(MICROLITE_CC_KERNEL_SRCS)
+
 MICROLITE_LIB_PATH := $(LIBDIR)$(MICROLITE_LIB_NAME)
 
 CXX := $(TARGET_TOOLCHAIN_ROOT)${TARGET_TOOLCHAIN_PREFIX}${CXX_TOOL}
@@ -747,6 +758,7 @@ $(CORE_OBJDIR)%.o: %.c $(THIRD_PARTY_TARGETS)
 $(CORE_OBJDIR)%.o: %.S $(THIRD_PARTY_TARGETS)
 	@mkdir -p $(dir $@)
 	$(CC) $(CCFLAGS) $(CORE_OPTIMIZATION_LEVEL) $(INCLUDES) -c $< -o $@
+
 
 $(THIRD_PARTY_OBJDIR)%.o: %.cc $(THIRD_PARTY_TARGETS)
 	@mkdir -p $(dir $@)
@@ -889,8 +901,13 @@ $(CODEGEN_PREPROCESSOR_PATH): $(CODEGEN_PREPROCESSOR_SRCS) $(MICROLITE_LIB_PATH)
 # Just build the test targets
 build: $(MICROLITE_BUILD_TARGETS)
 
+generate_projects: $(ALL_PROJECT_TARGETS)
+
 list_library_sources:
 	@echo $(MICROLITE_CC_SRCS) $(MICROLITE_CC_KERNEL_SRCS)
+
+list_microlite_library_sources:
+	@echo $(MICROLITE_CC_SRCS) 
 
 list_library_headers:
 	@echo $(MICROLITE_CC_HDRS)

@@ -33,21 +33,26 @@ else ifeq ($(TARGET_ARCH), cortex-m0plus)
 else ifeq ($(TARGET_ARCH), cortex-m3)
   CORE=M3
   ARM_LDFLAGS := -Wl,--cpu=Cortex-M3
+  TARGET_SPECIFIC_FLAGS += -DARM_MATH_DSP -DTARGET_CPU=cortex-m3
 
 else ifeq ($(TARGET_ARCH), cortex-m33)
   CORE=M33
   ARM_LDFLAGS := -Wl,--cpu=Cortex-M33
   CMSIS_ARM_FEATURES := _DSP_FP
+  TARGET_SPECIFIC_FLAGS += -D__DSP_PRESENT=1 -D__FPU_PRESENT=1 -D__VTOR_PRESENT=1 -D__FPU_USED=1
+  TARGET_SPECIFIC_FLAGS += -DARM_MATH_DSP -DTARGET_CPU=cortex-m33
   FLOAT=hard
 
 else ifeq ($(TARGET_ARCH), cortex-m33+nodsp)
   CORE=M33
   ARM_LDFLAGS := -Wl,--cpu=Cortex-M33.no_dsp.no_fp
+  TARGET_SPECIFIC_FLAGS += -DTARGET_CPU=cortex-m33
 
 else ifeq ($(TARGET_ARCH), cortex-m4)
   CORE=M4
   ARM_LDFLAGS := -Wl,--cpu=Cortex-M4.no_fp
   GCC_TARGET_ARCH := cortex-m4+nofp
+  TARGET_SPECIFIC_FLAGS += -DARM_MATH_DSP -DTARGET_CPU=cortex-m4
 
 else ifeq ($(TARGET_ARCH), cortex-m4+fp)
   CORE=M4
@@ -55,18 +60,22 @@ else ifeq ($(TARGET_ARCH), cortex-m4+fp)
   CMSIS_ARM_FEATURES := _FP
   FLOAT=hard
   GCC_TARGET_ARCH := cortex-m4
+  TARGET_SPECIFIC_FLAGS += -DARM_MATH_DSP -DTARGET_CPU=cortex-m4
 
 else ifeq ($(TARGET_ARCH), cortex-m4+sfp)
   CORE=M4
   ARM_LDFLAGS := -Wl,--cpu=Cortex-M4
   CMSIS_ARM_FEATURES := _FP
+  TARGET_SPECIFIC_FLAGS +=  -mfpu=fpv4-sp-d16
   FLOAT=softfp
   GCC_TARGET_ARCH := cortex-m4
+  TARGET_SPECIFIC_FLAGS += -DARM_MATH_DSP -DTARGET_CPU=cortex-m4
 
 else ifeq ($(TARGET_ARCH), cortex-m55)
   CORE=M55
   ARM_LDFLAGS := -Wl,--cpu=8.1-M.Main.mve.fp
   FLOAT=hard
+  TARGET_SPECIFIC_FLAGS += -DARM_MATH_MVEI -DTARGET_CPU=cortex-m55
 
 else ifeq ($(TARGET_ARCH), cortex-m55+nodsp+nofp)
   CORE=M55
@@ -75,6 +84,8 @@ else ifeq ($(TARGET_ARCH), cortex-m55+nodsp+nofp)
 else ifeq ($(TARGET_ARCH), cortex-m55+nofp)
   CORE=M55
   ARM_LDFLAGS := -Wl,--cpu=8.1-M.Main.mve.no_fp
+  TARGET_SPECIFIC_FLAGS += -D__DSP_PRESENT=1
+  TARGET_SPECIFIC_FLAGS += -DARM_MATH_MVEI -DTARGET_CPU=cortex-m55
 
 else ifeq ($(TARGET_ARCH), cortex-m7)
   CORE=M7
@@ -101,8 +112,7 @@ else
   $(error "TARGET_ARCH=$(TARGET_ARCH) is not supported")
 endif
 
-# Dependency to CMSIS-Device for DWT/PMU counters.
-ARM_CPU := "ARMC$(CORE)"
+ARM_CPU := ARMC$(CORE)
 CMSIS_DEFAULT_DOWNLOAD_PATH := $(MAKEFILE_DIR)/downloads/cmsis
 CMSIS_PATH := $(CMSIS_DEFAULT_DOWNLOAD_PATH)
 INCLUDES += \
@@ -143,9 +153,11 @@ else ifeq ($(TOOLCHAIN), gcc)
   TARGET_DEFAULT_TOOLCHAIN_ROOT := $(DOWNLOADS_DIR)/gcc_embedded/bin/
   TARGET_TOOLCHAIN_ROOT := $(TARGET_DEFAULT_TOOLCHAIN_ROOT)
   ifeq ($(TARGET_TOOLCHAIN_ROOT), $(TARGET_DEFAULT_TOOLCHAIN_ROOT))
-    DOWNLOAD_RESULT := $(shell $(MAKEFILE_DIR)/arm_gcc_download.sh ${DOWNLOADS_DIR} ${TENSORFLOW_ROOT})
-    ifneq ($(DOWNLOAD_RESULT), SUCCESS)
-      $(error Something went wrong with the GCC download: $(DOWNLOAD_RESULT))
+    ifdef $(SKIP_COMPILER_DOWNLOAD)
+      DOWNLOAD_RESULT := $(shell $(MAKEFILE_DIR)/arm_gcc_download.sh ${DOWNLOADS_DIR} ${TENSORFLOW_ROOT})
+      ifneq ($(DOWNLOAD_RESULT), SUCCESS)
+        $(error Something went wrong with the GCC download: $(DOWNLOAD_RESULT))
+      endif
     endif
   endif
 
@@ -162,6 +174,7 @@ else ifeq ($(TOOLCHAIN), gcc)
   CXXFLAGS += $(FLAGS_GCC)
   CCFLAGS += $(FLAGS_GCC)
 
+
 else
   $(error "TOOLCHAIN=$(TOOLCHAIN) is not supported.")
 endif
@@ -176,10 +189,11 @@ PLATFORM_FLAGS = \
   -Wno-unused-private-field \
   -fomit-frame-pointer \
   -MD \
-  -DCPU_$(CORE)=1
+  -DCPU_$(CORE)=1 \
+  $(TARGET_SPECIFIC_FLAGS)
 
 # For DWT/PMU counters. Header file name is depending on target architecture.
-PLATFORM_FLAGS += -DCMSIS_DEVICE_ARM_CORTEX_M_XX_HEADER_FILE=\"$(ARM_CPU)$(CMSIS_ARM_FEATURES).h\"
+PLATFORM_FLAGS += -DCMSIS_DEVICE_ARM_CORTEX_M_XX_HEADER_FILE="\\"$(ARM_CPU)$(CMSIS_ARM_FEATURES).h\\""
 PLATFORM_FLAGS += -D$(ARM_CPU)
 
 # Arm Cortex-M55 and Cortex-M85 use PMU counters.
@@ -190,6 +204,13 @@ endif
 # Common + C/C++ flags
 CXXFLAGS += $(PLATFORM_FLAGS)
 CCFLAGS += $(PLATFORM_FLAGS)
+
+ifeq ($(OPTIMIZED_KERNEL_DIR), cmsis_nn)
+  INCLUDES += \
+    -I$(MAKEFILE_DIR)/downloads/cmsis_nn/Include/ 
+    
+endif
+
 
 # Needed for the project generation interface.
 MICROLITE_CC_HDRS += \

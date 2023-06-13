@@ -1,0 +1,128 @@
+TARGET_TOOLCHAIN_ROOT := %{TARGET_TOOLCHAIN_ROOT}%
+TARGET_TOOLCHAIN_PREFIX := %{TARGET_TOOLCHAIN_PREFIX}%
+
+# These are microcontroller-specific rules for converting the ELF output
+# of the linker into a binary image that can be loaded directly.
+CXX             := '$(TARGET_TOOLCHAIN_ROOT)$(TARGET_TOOLCHAIN_PREFIX)g++'
+CC              := '$(TARGET_TOOLCHAIN_ROOT)$(TARGET_TOOLCHAIN_PREFIX)gcc'
+AS              := '$(TARGET_TOOLCHAIN_ROOT)$(TARGET_TOOLCHAIN_PREFIX)as'
+AR              := '$(TARGET_TOOLCHAIN_ROOT)$(TARGET_TOOLCHAIN_PREFIX)ar' 
+LD              := '$(TARGET_TOOLCHAIN_ROOT)$(TARGET_TOOLCHAIN_PREFIX)ld'
+NM              := '$(TARGET_TOOLCHAIN_ROOT)$(TARGET_TOOLCHAIN_PREFIX)nm'
+OBJDUMP         := '$(TARGET_TOOLCHAIN_ROOT)$(TARGET_TOOLCHAIN_PREFIX)objdump'
+OBJCOPY         := '$(TARGET_TOOLCHAIN_ROOT)$(TARGET_TOOLCHAIN_PREFIX)objcopy'
+SIZE            := '$(TARGET_TOOLCHAIN_ROOT)$(TARGET_TOOLCHAIN_PREFIX)size'
+
+RM = rm -f
+ARFLAGS := -csr
+LDFLAGS += %{LINKER_FLAGS}% 
+
+# FILL_HERE
+
+MICROLITE_CC_SRCS := %{MICROLITE_CC_SRCS}%
+MICROLITE_CC_KERNEL_SRCS := %{MICROLITE_CC_KERNEL_SRCS}%
+THIRD_PARTY_CC_SRCS := %{THIRD_PARTY_CC_SRCS}%
+THIRD_PARTY_KERNEL_CC_SRCS := %{THIRD_PARTY_KERNEL_CC_SRCS}%
+
+CORE_OPTIMIZATION_LEVEL := %{CORE_OPTIMIZATION_LEVEL}%
+THIRD_PARTY_KERNEL_OPTIMIZATION_LEVEL := %{THIRD_PARTY_KERNEL_OPTIMIZATION_LEVEL}%
+KERNEL_OPTIMIZATION_LEVEL := %{KERNEL_OPTIMIZATION_LEVEL}%
+
+OBJ_DIR := obj/
+CORE_OBJDIR := $(OBJ_DIR)core/
+KERNEL_OBJDIR := $(OBJ_DIR)kernels/
+THIRD_PARTY_KERNEL_OBJDIR := $(OBJ_DIR)third_party_kernels/
+THIRD_PARTY_OBJDIR := $(OBJ_DIR)third_party/
+
+CXXFLAGS := %{CXXFLAGS}%
+CCFLAGS := %{CCFLAGS}%
+INCLUDES := %{INCLUDES}%
+
+MICROLITE_LIB_OBJS := $(addprefix $(CORE_OBJDIR), \
+$(patsubst %.S,%.o,$(patsubst %.cc,%.o,$(patsubst %.c,%.o,$(MICROLITE_CC_SRCS)))))
+
+MICROLITE_THIRD_PARTY_OBJS := $(addprefix $(THIRD_PARTY_OBJDIR), \
+$(patsubst %.S,%.o,$(patsubst %.cc,%.o,$(patsubst %.c,%.o,$(THIRD_PARTY_CC_SRCS)))))
+
+MICROLITE_THIRD_PARTY_KERNEL_OBJS := $(addprefix $(THIRD_PARTY_KERNEL_OBJDIR), \
+$(patsubst %.S,%.o,$(patsubst %.cc,%.o,$(patsubst %.c,%.o,$(THIRD_PARTY_KERNEL_CC_SRCS)))))
+
+MICROLITE_KERNEL_OBJS := $(addprefix $(KERNEL_OBJDIR), \
+$(patsubst %.S,%.o,$(patsubst %.cc,%.o,$(patsubst %.c,%.o,$(MICROLITE_CC_KERNEL_SRCS)))))
+
+$(CORE_OBJDIR)%.o: %.cc 
+	@mkdir -p $(dir $@)
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) $(CORE_OPTIMIZATION_LEVEL) $(INCLUDES) -c $< -o $@
+
+$(CORE_OBJDIR)%.o: %.c 
+	@mkdir -p $(dir $@)
+	$(CC) $(CCFLAGS) $(LDFLAGS) $(CORE_OPTIMIZATION_LEVEL) $(INCLUDES) -c $< -o $@
+
+$(CORE_OBJDIR)%.o: %.S 
+	@mkdir -p $(dir $@)
+	$(CC) $(CCFLAGS)  $(LDFLAGS) $(CORE_OPTIMIZATION_LEVEL) $(INCLUDES) -c $< -o $@
+
+$(THIRD_PARTY_OBJDIR)%.o: %.cc
+	@mkdir -p $(dir $@)
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) $(CORE_OPTIMIZATION_LEVEL) $(INCLUDES) -c $< -o $@
+
+$(THIRD_PARTY_OBJDIR)%.o: %.c 
+	@mkdir -p $(dir $@)
+	$(CC) $(CCFLAGS) $(LDFLAGS) $(CORE_OPTIMIZATION_LEVEL) $(INCLUDES) -c $< -o $@
+
+$(THIRD_PARTY_OBJDIR)%.o: %.S 
+	@mkdir -p $(dir $@)
+	$(CC) $(CCFLAGS) $(LDFLAGS) $(CORE_OPTIMIZATION_LEVEL) $(INCLUDES) -c $< -o $@
+
+$(THIRD_PARTY_KERNEL_OBJDIR)%.o: %.cc
+	@mkdir -p $(dir $@)
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) $(THIRD_PARTY_KERNEL_OPTIMIZATION_LEVEL) $(INCLUDES) -c $< -o $@
+
+$(THIRD_PARTY_KERNEL_OBJDIR)%.o: %.c 
+	@mkdir -p $(dir $@)
+	$(CC) $(CCFLAGS) $(LDFLAGS) $(THIRD_PARTY_KERNEL_OPTIMIZATION_LEVEL) $(INCLUDES) -c $< -o $@
+
+$(THIRD_PARTY_KERNEL_OBJDIR)%.o: %.S
+	@mkdir -p $(dir $@)
+	$(CC) $(CCFLAGS) $(LDFLAGS) $(THIRD_PARTY_KERNEL_OPTIMIZATION_LEVEL) $(INCLUDES) -c $< -o $@
+
+$(KERNEL_OBJDIR)%.o: %.cc
+	@mkdir -p $(dir $@)
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) $(KERNEL_OPTIMIZATION_LEVEL) $(INCLUDES) -c $< -o $@
+
+$(KERNEL_OBJDIR)%.o: %.c
+	@mkdir -p $(dir $@)
+	$(CC) $(CCFLAGS) $(LDFLAGS) $(KERNEL_OPTIMIZATION_LEVEL) $(INCLUDES) -c $< -o $@
+
+$(KERNEL_OBJDIR)%.o: %.S 
+	@mkdir -p $(dir $@)
+	$(CC) $(CCFLAGS) $(LDFLAGS) $(KERNEL_OPTIMIZATION_LEVEL) $(INCLUDES) -c $< -o $@
+
+
+# library to be generated
+MICROLITE_LIB := libtensorflow-microlite.a
+MICROLITE_SO := libtensorflow-microlite.so
+
+# Gathers together all the objects we've compiled into a single '.a' archive.
+$(MICROLITE_LIB): $(MICROLITE_LIB_OBJS) $(MICROLITE_KERNEL_OBJS) $(MICROLITE_THIRD_PARTY_OBJS) $(MICROLITE_THIRD_PARTY_KERNEL_OBJS) $(MICROLITE_CUSTOM_OP_OBJS)
+	@mkdir -p $(dir $@)
+	$(AR) $(ARFLAGS) $(MICROLITE_LIB) $(MICROLITE_LIB_OBJS) \
+	$(MICROLITE_KERNEL_OBJS) $(MICROLITE_THIRD_PARTY_OBJS) $(MICROLITE_THIRD_PARTY_KERNEL_OBJS) $(MICROLITE_CUSTOM_OP_OBJS)
+
+
+# Creates a tensorflow-litemicro.a which excludes any example code.
+$(MICROLITE_SO): $(MICROLITE_LIB_OBJS) $(MICROLITE_KERNEL_OBJS) $(MICROLITE_THIRD_PARTY_OBJS) $(MICROLITE_THIRD_PARTY_KERNEL_OBJS) $(MICROLITE_CUSTOM_OP_OBJS)
+	@mkdir -p $(dir $@)
+	$(CXX) -shared  -o $(MICROLITE_SO) $(MICROLITE_LIB_OBJS) \
+	$(MICROLITE_KERNEL_OBJS) $(MICROLITE_THIRD_PARTY_OBJS) $(MICROLITE_THIRD_PARTY_KERNEL_OBJS) $(MICROLITE_CUSTOM_OP_OBJS)
+
+lib: $(MICROLITE_LIB)
+
+so: $(MICROLITE_SO)
+
+project : $(MICROLITE_LIB)
+	$(CXX) $(CXXFLAGS) -o $@ $(OBJS) $(LDFLAGS)
+
+clean:
+	-$(RM) -r $(OBJ_DIR)
+	-$(RM) ${MICROLITE_LIB}

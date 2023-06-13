@@ -19,6 +19,9 @@ import shutil
 from absl import app
 from absl import flags
 from mako import template
+
+import sys
+sys.path.insert('/home/sml-app/')
 from tflite_micro.tensorflow.lite.micro.tools import generate_test_for_model
 
 TEMPLATE_DIR = os.path.join(os.path.dirname(__file__), 'templates')

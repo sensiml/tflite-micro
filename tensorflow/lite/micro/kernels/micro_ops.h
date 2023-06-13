@@ -18,6 +18,7 @@ limitations under the License.
 #include "signal/micro/kernels/irfft.h"
 #include "signal/micro/kernels/rfft.h"
 #include "tensorflow/lite/c/common.h"
+#include "tensorflow/lite/micro/micro_common.h"
 
 // Forward declaration of all micro op kernel registration methods. These
 // registrations are included with the standard `BuiltinOpResolver`.
