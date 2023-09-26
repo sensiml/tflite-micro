@@ -77,7 +77,7 @@ int micro_model_setup(const void* model_data, int kTensorArenaSize,
 
 
 int8_t quantize_input(uint8_t input_value, float scale_factor, int zero_bias){
-  int tmp_value = input_value * (float)scale_factor;
+  int tmp_value = (input_value-127) * (float)scale_factor;
   tmp_value+=(float)zero_bias;
 
   if (tmp_value < -128) {
