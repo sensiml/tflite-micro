@@ -307,7 +307,7 @@ $(PRJDIR)$(3)/$(1)/%: tensorflow/lite/micro/tools/make/templates/%.tpl
 	sed -E 's#\%\{CCFLAGS\}\%#$(CCFLAGS)#g' | \
 	sed -E 's#\%\{INCLUDES\}\%#$(GENERATED_PROJECT_INCLUDES)#g' | \
 	sed -E 's#\%\{CORE_OPTIMIZATION_LEVEL\}\%#$(CORE_OPTIMIZATION_LEVEL)#g' | \
-	sed -E 's#\%\{THIRD_PARTY_KERNEL_OPTIMIZATION_LEVEL\}\%#$(THIRD_PARTY_KERNEL_OPTIMIZATION_LEVEL8)#g' | \
+	sed -E 's#\%\{THIRD_PARTY_KERNEL_OPTIMIZATION_LEVEL\}\%#$(THIRD_PARTY_KERNEL_OPTIMIZATION_LEVEL)#g' | \
 	sed -E 's#\%\{KERNEL_OPTIMIZATION_LEVEL\}\%#$(KERNEL_OPTIMIZATION_LEVEL)#g' | \
 	sed -E 's#\%\{TARGET_TOOLCHAIN_ROOT\}\%#$(6)#g' | \
 	sed -E 's#\%\{TARGET_TOOLCHAIN_PREFIX\}\%#$(7)#g' > $$@
