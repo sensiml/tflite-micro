@@ -121,7 +121,7 @@ endif
 ifeq ($(TOOLCHAIN), armclang)
   CORE_OPTIMIZATION_LEVEL := -Oz
 else ifeq ($(TOOLCHAIN), xc32)
-  CORE_OPTIMIZATION_LEVEL := 
+  CORE_OPTIMIZATION_LEVEL := -O2
 else
   CORE_OPTIMIZATION_LEVEL := -Os
 endif
