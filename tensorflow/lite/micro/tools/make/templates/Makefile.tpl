@@ -36,7 +36,7 @@ THIRD_PARTY_OBJDIR := $(OBJ_DIR)third_party/
 
 CXXFLAGS := %{CXXFLAGS}%
 CCFLAGS := %{CCFLAGS}%
-INCLUDES := %{INCLUDES}%
+INCLUDES := -I. %{INCLUDES}%
 
 MICROLITE_LIB_OBJS := $(addprefix $(CORE_OBJDIR), \
 $(patsubst %.S,%.o,$(patsubst %.cc,%.o,$(patsubst %.c,%.o,$(MICROLITE_CC_SRCS)))))
