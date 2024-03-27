@@ -24,7 +24,7 @@ from absl import flags
 from mako import template
 
 import sys
-from tflite_micro.tensorflow.lite.tools import visualize as visualize
+from tensorflow.lite.tools import visualize as visualize
 
 TEMPLATE_DIR = os.path.join(os.path.dirname(__file__), 'templates')
 TEMPLATE_DIR = os.path.abspath(TEMPLATE_DIR)
